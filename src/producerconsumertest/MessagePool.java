@@ -42,7 +42,9 @@ public class MessagePool {
 
         try {
             itemsProduced.acquire();
-            value = buffer[indexGet++ % buffer.length];
+            synchronized (this) {
+                value = buffer[indexGet++ % buffer.length];
+            }
             emptySpace.release();
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -58,7 +60,9 @@ public class MessagePool {
     public void put(String value) {
         try {
             emptySpace.acquire();
-            buffer[indexPut++ % buffer.length] = value;
+            synchronized (this) {
+                buffer[indexPut++ % buffer.length] = value;
+            }
             itemsProduced.release();
         } catch (InterruptedException e) {
             e.printStackTrace();
